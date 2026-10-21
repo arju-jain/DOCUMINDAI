@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <style>
+      .bg { fill: #FFFFFF; }
+      .header-bg { fill: #1E293B; }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #FFFFFF; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #94A3B8; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #64748B; font-weight: 600; text-transform: uppercase; }
+      .val { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; fill: #0F172A; font-weight: 500; }
+      .th { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #475569; font-weight: bold; }
+      .td { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; fill: #1E293B; }
+      .total-val { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2563EB; }
+    </style>
+  </defs>
+  <!-- Background Sheet with border -->
+  <rect width="600" height="800" fill="#FFFFFF"/>
+  <rect x="1" y="1" width="598" height="798" fill="none" stroke="#E2E8F0" stroke-width="2"/>
+
+  <!-- Header Banner -->
+  <rect x="0" y="0" width="600" height="90" fill="#1E293B"/>
+  <text x="40" y="48" class="title">ABC TRADERS PVT LTD</text>
+  <text x="40" y="70" class="subtitle">Tax Invoice &amp; Delivery Challan • GSTIN: 27AABCA1234F1Z5</text>
+  <text x="460" y="55" font-family="sans-serif" font-size="28px" font-weight="900" fill="#3B82F6">INVOICE</text>
+
+  <!-- Metadata box -->
+  <rect x="40" y="115" width="520" height="80" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="60" y="140" class="label">INVOICE NUMBER</text>
+  <text x="60" y="165" class="val">INV-1025</text>
+
+  <text x="210" y="140" class="label">INVOICE DATE</text>
+  <text x="210" y="165" class="val">2026-10-15</text>
+
+  <text x="360" y="140" class="label">DUE DATE</text>
+  <text x="360" y="165" class="val">2026-11-15</text>
+
+  <!-- Billing addresses -->
+  <text x="40" y="230" class="label">SUPPLIER / ISSUED BY</text>
+  <text x="40" y="252" class="val" font-weight="bold">ABC Traders</text>
+  <text x="40" y="272" class="td">42 Tech Industrial Estate</text>
+  <text x="40" y="292" class="td">Bangalore, Karnataka, 560001</text>
+  <text x="40" y="312" class="td">support@abctraders.example.com</text>
+
+  <text x="320" y="230" class="label">BILLED TO / CUSTOMER</text>
+  <text x="320" y="252" class="val" font-weight="bold">Global Cloud Corp</text>
+  <text x="320" y="272" class="td">Level 5, Silicon Tower</text>
+  <text x="320" y="292" class="td">Hyderabad, Telangana, 500081</text>
+  <text x="320" y="312" class="td">accounts@globalcloud.example.com</text>
+
+  <!-- Items Table Header -->
+  <rect x="40" y="350" width="520" height="32" fill="#F1F5F9" rx="4"/>
+  <text x="55" y="371" class="th">#</text>
+  <text x="85" y="371" class="th">DESCRIPTION</text>
+  <text x="320" y="371" class="th" text-anchor="end">QTY</text>
+  <text x="430" y="371" class="th" text-anchor="end">RATE (₹)</text>
+  <text x="540" y="371" class="th" text-anchor="end">AMOUNT (₹)</text>
+
+  <!-- Row 1 -->
+  <text x="55" y="410" class="td">1</text>
+  <text x="85" y="410" class="td">Cloud Compute Infrastructure Setup</text>
+  <text x="320" y="410" class="td" text-anchor="end">1</text>
+  <text x="430" y="410" class="td" text-anchor="end">600.00</text>
+  <text x="540" y="410" class="td" text-anchor="end">600.00</text>
+  <line x1="40" y1="428" x2="560" y2="428" stroke="#F1F5F9"/>
+
+  <!-- Row 2 -->
+  <text x="55" y="455" class="td">2</text>
+  <text x="85" y="455" class="td">Document Vision API Integration Pack</text>
+  <text x="320" y="455" class="td" text-anchor="end">2</text>
+  <text x="430" y="455" class="td" text-anchor="end">200.00</text>
+  <text x="540" y="455" class="td" text-anchor="end">400.00</text>
+  <line x1="40" y1="475" x2="560" y2="475" stroke="#F1F5F9"/>
+
+  <!-- Summary Table Calculation -->
+  <line x1="320" y1="510" x2="560" y2="510" stroke="#CBD5E1"/>
+  
+  <text x="330" y="535" class="td">Subtotal</text>
+  <text x="540" y="535" class="td" text-anchor="end" font-weight="600">₹1,000.00</text>
+
+  <text x="330" y="565" class="td">Tax (GST 18%)</text>
+  <text x="540" y="565" class="td" text-anchor="end" font-weight="600">₹180.00</text>
+
+  <rect x="320" y="585" width="240" height="42" fill="#EFF6FF" rx="4"/>
+  <text x="330" y="612" class="val" font-weight="bold" fill="#1E3A8A">Total Amount</text>
+  <text x="540" y="612" class="total-val" text-anchor="end">₹1,180.00</text>
+
+  <!-- Footer note -->
+  <rect x="40" y="670" width="520" height="70" rx="4" fill="#FAFAFA" stroke="#E2E8F0"/>
+  <text x="55" y="695" class="label">TERMS &amp; PAYMENT CONDITIONS</text>
+  <text x="55" y="715" class="td" font-size="11px">Payment is due within 30 days of receipt. Bank Transfer: HDFC BANK A/C 50200012345678 IFSC: HDFC0001234</text>
+  <text x="55" y="730" class="td" font-size="11px">Thank you for partnering with ABC Traders!</text>
+</svg>

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../multidocument"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "multidocument"
+	}
+}

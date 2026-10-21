@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DocuMind AI - Extract, validate, and organize information from invoices, receipts, and forms in seconds.">
+  <meta name="theme-color" content="#2563EB">
+  <title>DocuMind AI - Turn Documents into Structured Data</title>
+  
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for Evaluation Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <img src="assets/logo.svg" alt="DocuMind AI Logo" width="36" height="36">
+        </div>
+        <div class="brand-info">
+          <span class="brand-name">DocuMind AI</span>
+          <span class="brand-tag">Document Intelligence</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNav" aria-label="Main Navigation">
+        <span class="nav-label">Workspace</span>
+        <a class="nav-item active" data-section="sectionDashboard" id="navDashboard" role="button" tabindex="0">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-section="sectionExtract" id="navExtract" role="button" tabindex="0">
+          <i data-lucide="file-up"></i>
+          <span>Extract Document</span>
+        </a>
+        <a class="nav-item" data-section="sectionResults" id="navResults" role="button" tabindex="0">
+          <i data-lucide="table"></i>
+          <span>Results</span>
+          <span class="nav-count-badge" id="resultsCountBadge">0</span>
+        </a>
+
+        <span class="nav-label" style="margin-top: 12px;">Analytics & System</span>
+        <a class="nav-item" data-section="sectionEvaluation" id="navEvaluation" role="button" tabindex="0">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Evaluation</span>
+        </a>
+        <a class="nav-item" data-section="sectionAbout" id="navAbout" role="button" tabindex="0">
+          <i data-lucide="settings"></i>
+          <span>About & API</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- API Connection Widget -->
+        <div class="api-status-widget" id="apiStatusWidget" title="Flask Backend Connection Status">
+          <div class="api-status-left">
+            <span class="status-dot connecting" id="apiStatusDot"></span>
+            <div>
+              <div class="status-label" id="apiStatusText">Connecting...</div>
+              <div style="font-size: 0.7rem; color: var(--text-tertiary);" id="apiEndpointText">127.0.0.1:8000</div>
+            </div>
+          </div>
+          <button class="api-refresh-btn" id="btnCheckApiHealth" title="Check API Health">
+            <i data-lucide="refresh-cw"></i>
+          </button>
+        </div>
+
+        <!-- Optional Mock Development Mode Toggle -->
+        <div class="mock-toggle-card">
+          <div class="mock-toggle-info">
+            <span class="mock-toggle-title">Mock Demo Mode</span>
+            <span class="mock-toggle-desc">For testing without Flask</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="mockModeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <h1 class="page-title" id="currentSectionTitle">
+            <i data-lucide="layout-dashboard" style="width: 20px; height: 20px; color: var(--primary);"></i>
+            <span>Dashboard Overview</span>
+          </h1>
+        </div>
+        <div class="header-right">
+          <span class="tagline-pill">Turn Documents into Structured Data</span>
+          <button class="btn btn-secondary btn-sm" id="btnTopQuickUpload">
+            <i data-lucide="upload-cloud"></i>
+            <span>New Document</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mock Mode Warning Banner -->
+      <div class="mock-banner" id="mockBanner">
+        <div class="mock-banner-content">
+          <i data-lucide="alert-triangle"></i>
+          <span><strong>Demo / Mock Mode Active:</strong> Simulating API responses for UI demonstration. Turn off in the sidebar for live Flask backend integration.</span>
+        </div>
+        <button class="btn btn-sm btn-secondary" id="btnDisableMockMode" style="padding: 3px 8px; font-size: 0.75rem;">
+          Switch to Live API
+        </button>
+      </div>
+
+      <div class="content-area">
+
+        <!-- ==============================================================
+             SECTION 1: DASHBOARD OVERVIEW
+             ============================================================== -->
+        <section class="view-section active" id="sectionDashboard">
+          
+          <!-- Workspace Hero Banner -->
+          <div class="workspace-hero">
+            <div class="workspace-badge">
+              <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+              <span>Multimodal Vision & NLP Pipeline</span>
+            </div>
+            <h2 class="workspace-heading">Document Intelligence Workspace</h2>
+            <p class="workspace-description">
+              Upload invoices, receipts, and forms in image or PDF format. Extract key fields using Vision-Language Models, validate business rules, detect discrepancies, and export structured data.
+            </p>
+          </div>
+
+          <!-- KPI Summary Cards (Updated from actual processing results) -->
+          <div class="kpi-grid">
+            <!-- 1. Document Status -->
+            <div class="kpi-card status-primary" id="kpiCardStatus">
+              <div class="kpi-top">
+                <span class="kpi-label">Document Status</span>
+                <div class="kpi-icon-wrap">
+                  <i data-lucide="file-text" id="kpiIconStatus"></i>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiDocStatus" style="font-size: 1.35rem; margin-top: 4px;">No Document</div>
+              <div class="kpi-caption" id="kpiDocStatusDesc">
+                <i data-lucide="info" style="width: 12px; height: 12px;"></i>
+                <span>Awaiting document upload</span>
+              </div>
+            </div>
+
+            <!-- 2. Fields Extracted -->
+            <div class="kpi-card status-success">
+              <div class="kpi-top">
+                <span class="kpi-label">Fields Extracted</span>
+                <div class="kpi-icon-wrap">
+                  <i data-lucide="check-circle-2"></i>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiFieldsExtracted">0</div>
+              <div class="kpi-caption">
+                <i data-lucide="arrow-right" style="width: 12px; height: 12px;"></i>
+                <span id="kpiExtractedSubtitle">0 total detected fields</span>
+              </div>
+            </div>
+
+            <!-- 3. Requiring Review -->
+            <div class="kpi-card status-warning">
+              <div class="kpi-top">
+                <span class="kpi-label">Requires Review</span>
+                <div class="kpi-icon-wrap">
+                  <i data-lucide="alert-circle"></i>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiFieldsReview">0</div>
+              <div class="kpi-caption">
+                <i data-lucide="shield-alert" style="width: 12px; height: 12px;"></i>
+                <span id="kpiReviewSubtitle">Low confidence or warnings</span>
+              </div>
+            </div>
+
+            <!-- 4. Missing Fields -->
+            <div class="kpi-card status-danger">
+              <div class="kpi-top">
+                <span class="kpi-label">Missing Fields</span>
+                <div class="kpi-icon-wrap">
+                  <i data-lucide="x-circle"></i>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiFieldsMissing">0</div>
+              <div class="kpi-caption">
+                <i data-lucide="alert-octagon" style="width: 12px; height: 12px;"></i>
+                <span id="kpiMissingSubtitle">Expected fields not found</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Workflows Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">
+                  <i data-lucide="workflow"></i>
+                  <span>Extraction & Validation Workflow</span>
+                </h3>
+                <p class="card-subtitle">Three-step pipeline to extract and verify document data</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                
+                <div style="padding: 16px; background-color: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md);">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">1</span>
+                    <strong style="color: var(--text-primary);">Upload & Inspect</strong>
+                  </div>
+                  <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Select or drag-and-drop any invoice, receipt, or form in PNG, JPG, or PDF format up to 15MB.
+                  </p>
+                  <button class="btn btn-secondary btn-sm" id="btnWorkflowUpload">
+                    <i data-lucide="file-up"></i>
+                    <span>Go to Upload</span>
+                  </button>
+                </div>
+
+                <div style="padding: 16px; background-color: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md);">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">2</span>
+                    <strong style="color: var(--text-primary);">Extract & Validate</strong>
+                  </div>
+                  <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Backend multimodal OCR extracts fields, calculates confidence scores, and executes business validation checks.
+                  </p>
+                  <button class="btn btn-secondary btn-sm" id="btnWorkflowResults">
+                    <i data-lucide="eye"></i>
+                    <span>View Results</span>
+                  </button>
+                </div>
+
+                <div style="padding: 16px; background-color: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md);">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">3</span>
+                    <strong style="color: var(--text-primary);">Verify & Export</strong>
+                  </div>
+                  <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Review any flagged discrepancies or missing fields, then export structured data in CSV or JSON.
+                  </p>
+                  <button class="btn btn-secondary btn-sm" id="btnWorkflowEval">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>View Evaluation</span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ==============================================================
+             SECTION 2: EXTRACT DOCUMENT (Upload & Preview)
+             ============================================================== -->
+        <section class="view-section" id="sectionExtract">
+          
+          <div class="extract-workspace-grid">
+            
+            <!-- Left Column: Upload Component -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">
+                    <i data-lucide="file-up"></i>
+                    <span>Document Upload</span>
+                  </h3>
+                  <p class="card-subtitle">Choose a document to preview and send for extraction</p>
+                </div>
+              </div>
+
+              <div class="card-body upload-card-body">
+                
+                <!-- Hidden file input -->
+                <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,image/png,image/jpeg,application/pdf" style="display: none;">
+
+                <!-- Drag & Drop Zone -->
+                <div class="dropzone-container" id="dropzone" role="button" tabindex="0" aria-label="Drop document here or click to browse">
+                  <div class="dropzone-icon-box">
+                    <i data-lucide="upload-cloud"></i>
+                  </div>
+                  <div class="dropzone-text-group">
+                    <span class="dropzone-main-text">Drag and drop your document here</span>
+                    <span class="dropzone-sub-text">or browse files from your device</span>
+                  </div>
+                  <span class="dropzone-formats-badge">
+                    Supported formats: PDF, PNG, JPG, JPEG (Max 15MB)
+                  </span>
+                </div>
+
+                <!-- Selected File Card (hidden by default) -->
+                <div class="selected-file-card" id="selectedFileCard">
+                  <div class="file-info-group">
+                    <div class="file-type-icon" id="fileTypeIcon">
+                      <i data-lucide="file-text"></i>
+                    </div>
+                    <div class="file-meta-text">
+                      <span class="file-name-text" id="selectedFileName">document.pdf</span>
+                      <span class="file-size-text" id="selectedFileSize">0 KB</span>
+                    </div>
+                  </div>
+                  <div class="file-actions">
+                    <button class="btn btn-secondary btn-sm" id="btnReplaceFile" title="Replace with another file">
+                      <i data-lucide="refresh-cw"></i>
+                      <span>Replace</span>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" id="btnRemoveFile" title="Remove selected file">
+                      <i data-lucide="trash-2"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sample Document Helper for Instant Hackathon Demonstration -->
+                <div class="sample-doc-helper">
+                  <span>Need an invoice to test?</span>
+                  <button class="btn btn-secondary btn-sm" id="btnLoadSampleInvoice">
+                    <i data-lucide="file-check"></i>
+                    <span>Load Sample Invoice</span>
+                  </button>
+                </div>
+
+                <!-- Error / Validation Alert Container -->
+                <div class="alert-box alert-danger" id="uploadErrorAlert" style="display: none;">
+                  <i data-lucide="alert-circle"></i>
+                  <div id="uploadErrorMessage">Error text</div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-bar">
+                  <button class="btn btn-primary btn-lg" id="btnExtractValidate" style="flex: 1;" disabled>
+                    <i data-lucide="sparkles"></i>
+                    <span id="btnExtractText">Extract & Validate</span>
+                  </button>
+                  <button class="btn btn-secondary btn-lg" id="btnResetDocument">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Reset</span>
+                  </button>
+                </div>
+
+                <!-- Document Status Indicator -->
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); padding-top: 4px;">
+                  <span>Selected Document Status:</span>
+                  <span id="documentStatusBadge" class="status-badge unavailable">No File Selected</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Right Column: Document Preview Panel -->
+            <div class="card preview-card" id="previewCard">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">
+                    <i data-lucide="eye"></i>
+                    <span>Document Preview</span>
+                  </h3>
+                  <p class="card-subtitle" id="previewSubtitle">Inspect document details prior to processing</p>
+                </div>
+                <!-- Preview Zoom Controls -->
+                <div class="preview-controls" id="previewControls">
+                  <button class="btn btn-secondary btn-sm btn-icon-only" id="btnZoomPreview" title="Expand / Zoom Document">
+                    <i data-lucide="maximize-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-body" style="flex: 1; display: flex; flex-direction: column; padding: 0;">
+                <div class="preview-container" id="previewContainer">
+                  
+                  <!-- Empty state -->
+                  <div class="preview-empty-state" id="previewEmptyState">
+                    <i data-lucide="file-search"></i>
+                    <span class="preview-empty-title">No document selected</span>
+                    <span class="preview-empty-desc">Upload an invoice, receipt, or form on the left to preview it here</span>
+                  </div>
+
+                  <!-- Image Preview Wrapper -->
+                  <div class="preview-image-wrapper" id="previewImageWrapper">
+                    <img id="previewImage" class="preview-image" alt="Uploaded Document Preview">
+                  </div>
+
+                  <!-- PDF Preview Wrapper -->
+                  <div class="preview-pdf-wrapper" id="previewPdfWrapper">
+                    <iframe id="previewPdfFrame" class="preview-pdf-frame" title="PDF Document Viewer"></iframe>
+                  </div>
+
+                  <!-- Processing Overlay -->
+                  <div class="processing-overlay" id="processingOverlay">
+                    <div class="spinner"></div>
+                    <div class="processing-text-group">
+                      <span class="processing-title">Analyzing your document...</span>
+                      <span class="processing-subtitle">Sending to Flask backend for multimodal OCR &amp; validation</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==============================================================
+             SECTION 3: RESULTS (Extraction Table, Validation & Exports)
+             ============================================================== -->
+        <section class="view-section" id="sectionResults">
+          
+          <!-- Top Results Summary Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">
+                  <i data-lucide="file-check-2"></i>
+                  <span>Extraction Results</span>
+                </h3>
+                <p class="card-subtitle">Structured fields extracted from the processed document</p>
+              </div>
+
+              <!-- Metadata Chips & Search -->
+              <div class="results-header-actions">
+                <div class="meta-chip">
+                  <span>Document Type:</span>
+                  <strong id="resDocType">None</strong>
+                </div>
+                <div class="meta-chip">
+                  <span>Document ID:</span>
+                  <strong id="resDocId">-</strong>
+                </div>
+                <div class="meta-chip">
+                  <span>Confidence Threshold:</span>
+                  <strong id="resThresholdText">85%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              
+              <!-- Filter / Search Row -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 240px;">
+                  <div class="input-group" style="flex: 1;">
+                    <input type="text" id="resultsSearchInput" class="text-input" placeholder="Search extracted fields or values..." style="padding: 8px 12px; font-size: 0.85rem;">
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span style="font-size: 0.8rem; color: var(--text-secondary);">Filter:</span>
+                  <button class="btn btn-secondary btn-sm" id="btnFilterAll">All</button>
+                  <button class="btn btn-secondary btn-sm" id="btnFilterReview">Review</button>
+                  <button class="btn btn-secondary btn-sm" id="btnFilterMissing">Missing</button>
+                  <button class="btn btn-secondary btn-sm" id="btnFilterInvalid">Invalid</button>
+                </div>
+              </div>
+
+              <!-- Extraction Results Table -->
+              <div class="table-responsive">
+                <table class="data-table" id="resultsTable" aria-label="Extracted Document Fields">
+                  <thead>
+                    <tr>
+                      <th style="width: 24%;">Field Name</th>
+                      <th style="width: 28%;">Extracted Value</th>
+                      <th style="width: 18%;">Confidence</th>
+                      <th style="width: 14%;">Status</th>
+                      <th style="width: 16%;">Validation / Note</th>
+                    </tr>
+                  </thead>
+                  <tbody id="resultsTableBody">
+                    <!-- Dynamic Rows Rendered by JS -->
+                    <tr>
+                      <td colspan="5">
+                        <div class="empty-table-state">
+                          <i data-lucide="file-question"></i>
+                          <span style="font-weight: 600; color: var(--text-secondary);">No extraction results yet</span>
+                          <span style="font-size: 0.8rem;">Upload a document and click "Extract & Validate" to view structured fields.</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Dedicated Validation Summary Panel -->
+              <div class="validation-panel" id="validationPanel">
+                <div class="card-title" style="font-size: 0.95rem;">
+                  <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+                  <span>Validation &amp; Logic Summary</span>
+                </div>
+
+                <div class="validation-stats-bar">
+                  <div class="v-stat">
+                    <span>Total Detected:</span>
+                    <span class="v-stat-num" id="valTotalFields">0</span>
+                  </div>
+                  <div class="v-stat passed">
+                    <i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i>
+                    <span>Passing Checks:</span>
+                    <span class="v-stat-num" id="valPassedChecks">0</span>
+                  </div>
+                  <div class="v-stat warnings">
+                    <i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: var(--warning);"></i>
+                    <span>Low Confidence:</span>
+                    <span class="v-stat-num" id="valLowConfFields">0</span>
+                  </div>
+                  <div class="v-stat missing">
+                    <i data-lucide="x-circle" style="width: 14px; height: 14px; color: var(--danger);"></i>
+                    <span>Missing Fields:</span>
+                    <span class="v-stat-num" id="valMissingFields">0</span>
+                  </div>
+                  <div class="v-stat">
+                    <span>Manual Review Required:</span>
+                    <span class="v-stat-num" id="valReviewRequired">0</span>
+                  </div>
+                </div>
+
+                <!-- Warning / Alert Items List from Backend -->
+                <div class="warning-list" id="validationWarningsList">
+                  <div class="warning-item" style="background-color: #F8FAFC; border: 1px solid var(--border); color: var(--text-secondary);">
+                    <i data-lucide="info"></i>
+                    <span>Awaiting document extraction. Business validation warnings (such as subtotal + tax = total discrepancies) will be detailed here.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Export Controls Card -->
+              <div class="card export-card">
+                <div class="card-body">
+                  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                      <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Export Structured Data</h4>
+                      <p class="export-status-note" id="exportStatusNote">Download extracted fields with confidence ratings and validation statuses.</p>
+                    </div>
+                    <div class="export-actions-row">
+                      <button class="btn btn-secondary" id="btnDownloadCSV" disabled title="Download results as CSV">
+                        <i data-lucide="file-spreadsheet"></i>
+                        <span>Download CSV</span>
+                      </button>
+                      <button class="btn btn-secondary" id="btnDownloadJSON" disabled title="Download results as JSON">
+                        <i data-lucide="file-json"></i>
+                        <span>Download JSON</span>
+                      </button>
+                      <button class="btn btn-secondary btn-icon-only" id="btnCopyJSON" disabled title="Copy JSON payload to clipboard">
+                        <i data-lucide="copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ==============================================================
+             SECTION 4: ACCURACY EVALUATION DASHBOARD (Compulsory Feature)
+             ============================================================== -->
+        <section class="view-section" id="sectionEvaluation">
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">
+                  <i data-lucide="bar-chart-2"></i>
+                  <span>Held-Out Model Accuracy Evaluation</span>
+                </h3>
+                <p class="card-subtitle">
+                  Benchmarked against at least 30 held-out documents with ground-truth manual verification
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 0.78rem; color: var(--text-tertiary);" id="evalLastUpdated">Last checked: Never</span>
+                <button class="btn btn-secondary btn-sm" id="btnRefreshEvaluation">
+                  <i data-lucide="refresh-cw"></i>
+                  <span>Fetch Evaluation Report</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              
+              <!-- Explanation Note -->
+              <div class="alert-box alert-info" style="margin-bottom: 24px;">
+                <i data-lucide="info"></i>
+                <div>
+                  <strong>About Evaluation Metrics:</strong> Field-level accuracy measures the percentage of evaluated documents for which a field was extracted correctly compared to verified ground-truth values.
+                </div>
+              </div>
+
+              <!-- Evaluation KPI Summary Cards -->
+              <div class="kpi-grid" style="margin-bottom: 24px;">
+                <div class="kpi-card status-primary">
+                  <div class="kpi-top">
+                    <span class="kpi-label">Documents Evaluated</span>
+                    <div class="kpi-icon-wrap"><i data-lucide="files"></i></div>
+                  </div>
+                  <div class="kpi-value" id="evalDocsCount">-</div>
+                  <div class="kpi-caption"><span>Held-out evaluation dataset</span></div>
+                </div>
+
+                <div class="kpi-card status-success">
+                  <div class="kpi-top">
+                    <span class="kpi-label">Overall Accuracy</span>
+                    <div class="kpi-icon-wrap"><i data-lucide="percent"></i></div>
+                  </div>
+                  <div class="kpi-value" id="evalOverallAccuracy">-</div>
+                  <div class="kpi-caption"><span>Average field-level precision</span></div>
+                </div>
+
+                <div class="kpi-card status-warning">
+                  <div class="kpi-top">
+                    <span class="kpi-label">Total Fields Evaluated</span>
+                    <div class="kpi-icon-wrap"><i data-lucide="check-check"></i></div>
+                  </div>
+                  <div class="kpi-value" id="evalTotalFieldsCount">-</div>
+                  <div class="kpi-caption"><span>Across all test documents</span></div>
+                </div>
+
+                <div class="kpi-card status-danger">
+                  <div class="kpi-top">
+                    <span class="kpi-label">Fields Requiring Review</span>
+                    <div class="kpi-icon-wrap"><i data-lucide="alert-circle"></i></div>
+                  </div>
+                  <div class="kpi-value" id="evalReviewFieldsCount">-</div>
+                  <div class="kpi-caption"><span>Accuracy &lt; 90% benchmark</span></div>
+                </div>
+              </div>
+
+              <!-- Evaluation Content Grid (Table + Chart.js) -->
+              <div class="evaluation-grid" id="evaluationGrid">
+                
+                <!-- Left: Accuracy Table -->
+                <div class="card" style="box-shadow: none;">
+                  <div class="card-header" style="padding: 12px 16px;">
+                    <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary);">Field-Level Accuracy Breakdown</span>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="data-table" id="evaluationTable">
+                      <thead>
+                        <tr>
+                          <th>Field Name</th>
+                          <th>Correct</th>
+                          <th>Total</th>
+                          <th>Accuracy (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="evaluationTableBody">
+                        <tr>
+                          <td colspan="4" style="text-align: center; padding: 24px; color: var(--text-tertiary);">
+                            No evaluation data loaded yet.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Right: Chart.js Bar Chart -->
+                <div class="card" style="box-shadow: none;">
+                  <div class="card-header" style="padding: 12px 16px;">
+                    <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary);">Field Accuracy Comparison Chart</span>
+                  </div>
+                  <div class="chart-card-body">
+                    <canvas id="accuracyChart"></canvas>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Evaluation Unavailable Banner -->
+              <div class="evaluation-empty-banner" id="evalUnavailableBanner" style="display: none; margin-top: 16px;">
+                <i data-lucide="bar-chart"></i>
+                <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">
+                  Evaluation report is not available yet.
+                </div>
+                <div style="font-size: 0.85rem; max-width: 500px;">
+                  The backend has not returned evaluation data from <code>GET /api/evaluation</code>. Make sure the Flask server is running and the 30-document evaluation benchmark has completed.
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btnRetryEvaluation">
+                  <i data-lucide="refresh-cw"></i>
+                  <span>Retry Evaluation Fetch</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ==============================================================
+             SECTION 5: ABOUT & API STATUS
+             ============================================================== -->
+        <section class="view-section" id="sectionAbout">
+          
+          <div class="settings-grid">
+            
+            <!-- Left: Application Identity & Architecture -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">
+                    <i data-lucide="info"></i>
+                    <span>About DocuMind AI</span>
+                  </h3>
+                  <p class="card-subtitle">Multimodal Document Intelligence Platform</p>
+                </div>
+              </div>
+              <div class="card-body" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                  <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
+                    Turn Documents into Structured Data
+                  </h4>
+                  <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.6;">
+                    Extract, validate, and organize information from invoices, receipts, and forms in seconds.
+                    Built for high accuracy, automated reconciliation, and seamless data export.
+                  </p>
+                </div>
+
+                <div style="background-color: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
+                  <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary); text-transform: uppercase; margin-bottom: 6px;">
+                    Hackathon Specifications Met
+                  </div>
+                  <ul style="font-size: 0.82rem; color: var(--text-secondary); padding-left: 18px; line-height: 1.6;">
+                    <li>Vanilla JS, HTML5, CSS3 with Zero Framework Bloat</li>
+                    <li>Full PDF &amp; Image drag-and-drop with client-side preview</li>
+                    <li>Dynamic field rendering with safe DOM methods (anti-XSS)</li>
+                    <li>Validation discrepancy flagging (Subtotal + Tax mismatch, date validity)</li>
+                    <li>RFC-compliant CSV &amp; structured JSON export engines</li>
+                    <li>Interactive 30+ held-out document evaluation dashboard &amp; Chart.js</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;">Security &amp; Privacy Safeguards</div>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+                    Client-side validation strictly enforces MIME types, file extensions, and a 15MB size ceiling.
+                    All rendered text is escaped using safe DOM APIs. Temporary preview URLs are immediately revoked to prevent memory leaks.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Backend API Configuration & Connection Tester -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">
+                    <i data-lucide="sliders"></i>
+                    <span>Backend API Configuration</span>
+                  </h3>
+                  <p class="card-subtitle">Connect and test with your Python FastAPI backend</p>
+                </div>
+              </div>
+              <div class="card-body" style="display: flex; flex-direction: column; gap: 16px;">
+                
+                <div class="input-group">
+                  <label for="apiBaseUrlInput" class="input-label">API Base URL</label>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="apiBaseUrlInput" class="text-input" value="http://127.0.0.1:8000/api" style="flex: 1;" placeholder="http://127.0.0.1:8000/api">
+                    <button class="btn btn-primary btn-sm" id="btnSaveApiUrl">
+                      <span>Save</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="btnTestApiConnection">
+                      <i data-lucide="zap"></i>
+                      <span>Test Ping</span>
+                    </button>
+                  </div>
+                  <span style="font-size: 0.72rem; color: var(--text-tertiary);">Configurable for local FastAPI (port 8000), ngrok, or remote servers</span>
+                </div>
+
+                <!-- API Ping Test Results Box -->
+                <div id="apiTestResult" style="display: none; padding: 12px; border-radius: var(--radius-md); font-size: 0.82rem; font-family: var(--font-mono);">
+                  <!-- Dynamic response output -->
+                </div>
+
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                    Verified FastAPI Backend Endpoints
+                  </div>
+                  <div class="endpoint-list">
+                    <div class="endpoint-item">
+                      <span class="http-method get">GET</span>
+                      <code>/api/health</code>
+                      <span style="font-size: 0.72rem; color: var(--text-tertiary);">Backend ping</span>
+                    </div>
+                    <div class="endpoint-item">
+                      <span class="http-method post">POST</span>
+                      <code>/api/documents/process</code>
+                      <span style="font-size: 0.72rem; color: var(--text-tertiary);">multipart/form-data (file)</span>
+                    </div>
+                    <div class="endpoint-item">
+                      <span class="http-method get">GET</span>
+                      <code>/api/evaluation</code>
+                      <span style="font-size: 0.72rem; color: var(--text-tertiary);">32-Doc accuracy report</span>
+                    </div>
+                    <div class="endpoint-item">
+                      <span class="http-method post">POST</span>
+                      <code>/api/export/csv</code>
+                      <span style="font-size: 0.72rem; color: var(--text-tertiary);">CSV export (frontend fallback)</span>
+                    </div>
+                    <div class="endpoint-item">
+                      <span class="http-method post">POST</span>
+                      <code>/api/export/json</code>
+                      <span style="font-size: 0.72rem; color: var(--text-tertiary);">JSON export (frontend fallback)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">FastAPI Server Command:</div>
+                  <div class="code-block">python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000</div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Zoom / High-Res Lightbox Modal -->
+  <div class="modal-backdrop" id="imageZoomModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="zoomModalTitle">Document Inspection</span>
+        <button class="btn btn-secondary btn-sm btn-icon-only" id="btnCloseZoomModal" aria-label="Close modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="zoomModalImage" class="modal-image" alt="High-Res Zoomed Document">
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Main Application Script -->
+  <script src="script.js"></script>
+</body>
+</html>

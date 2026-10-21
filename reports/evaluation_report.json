@@ -1,0 +1,52 @@
+{
+  "status": "completed",
+  "total_documents": 32,
+  "successfully_processed": 32,
+  "failed_processing": 0,
+  "field_metrics": {
+    "vendor_name": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    },
+    "invoice_number": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    },
+    "invoice_date": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    },
+    "subtotal": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    },
+    "tax": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    },
+    "grand_total": {
+      "evaluated_count": 32,
+      "correct_count": 32,
+      "missing_count": 0,
+      "accuracy_percentage": 100.0
+    }
+  },
+  "overall_accuracy_percentage": 100.0,
+  "normalization_rules": {
+    "dates": "Normalized to ISO YYYY-MM-DD when unambiguous (e.g. named months, Day > 12); rejected if ambiguous.",
+    "monetary": "Parsed to standard numeric float rounded to 2 decimal places with $0.05 rounding tolerance.",
+    "invoice_numbers": "Preserved as exact strings including leading zeros.",
+    "vendors": "Normalized by stripping excess whitespace and comparing normalized substring/equality."
+  },
+  "evaluated_at": "2026-10-20T14:38:17.054552"
+}

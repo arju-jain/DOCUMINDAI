@@ -1,0 +1,33 @@
+document_id,filename,vendor_name,invoice_number,invoice_date,subtotal,tax,grand_total
+DOC-001,inv_01_techcorp.pdf,TechCorp Solutions Inc,TC-2026-881,2026-05-14,1250.00,125.00,1375.00
+DOC-002,inv_02_apex_logistics.pdf,Apex Global Logistics,AGL-99401,2026-06-20,3400.00,340.00,3740.00
+DOC-003,inv_03_summit_cloud.png,Summit Cloud Systems,SC-10024,2026-07-01,520.00,52.00,572.00
+DOC-004,inv_04_blue_ocean_retail.pdf,Blue Ocean Retailers,BOR-4421,2026-04-18,890.50,89.05,979.55
+DOC-005,inv_05_quantum_lab.jpg,Quantum Research Labs,QRL-7730,2026-08-11,2100.00,210.00,2310.00
+DOC-006,inv_06_stellar_media.pdf,Stellar Media Partners,SMP-00892,2026-03-25,1500.00,150.00,1650.00
+DOC-007,inv_07_horizon_energy.pdf,Horizon Clean Energy,HCE-3312,2026-09-05,4500.00,450.00,4950.00
+DOC-008,inv_08_nexus_consulting.png,Nexus Strategic Advisory,NSA-5510,2026-02-19,6000.00,600.00,6600.00
+DOC-009,inv_09_vanguard_security.pdf,Vanguard Cyber Security,VCS-9021,2026-10-02,1850.00,185.00,2035.00
+DOC-010,inv_10_zenith_supplies.pdf,Zenith Medical Supplies,ZMS-6644,2026-01-30,920.00,92.00,1012.00
+DOC-011,inv_11_silverline_logistics.jpg,Silverline Freightways,SLF-1029,2026-05-22,3100.00,310.00,3410.00
+DOC-012,inv_12_crestview_print.pdf,Crestview Creative Print,CCP-4011,2026-06-15,740.00,74.00,814.00
+DOC-013,inv_13_pinnacle_soft.pdf,Pinnacle Software Labs,PSL-8820,2026-07-28,2800.00,280.00,3080.00
+DOC-014,inv_14_aurora_design.png,Aurora Industrial Design,AID-5541,2026-08-04,1950.00,195.00,2145.00
+DOC-015,inv_15_beacon_telecom.pdf,Beacon Telecom Network,BTN-9923,2026-09-18,420.00,42.00,462.00
+DOC-016,inv_16_emerald_catering.pdf,Emerald Events & Catering,EEC-3341,2026-03-12,1350.00,135.00,1485.00
+DOC-017,inv_17_omega_hardware.jpg,Omega Computer Systems,OCS-7712,2026-04-05,3800.00,380.00,4180.00
+DOC-018,inv_18_solaris_legal.pdf,Solaris Legal Counsel,SLC-1190,2026-05-30,5500.00,550.00,6050.00
+DOC-019,inv_19_prime_packaging.pdf,Prime Industrial Pack,PIP-6632,2026-06-08,850.00,85.00,935.00
+DOC-020,inv_20_matrix_automation.png,Matrix Automation Group,MAG-8841,2026-07-14,4900.00,490.00,5390.00
+DOC-021,inv_21_atlas_freight.pdf,Atlas Freight Express,AFE-2204,2026-08-26,1600.00,160.00,1760.00
+DOC-022,inv_22_falcon_electrical.pdf,Falcon Electrical Works,FEW-5509,2026-09-10,2250.00,225.00,2475.00
+DOC-023,inv_23_titan_security.jpg,Titan Facility Services,TFS-4419,2026-10-08,3150.00,315.00,3465.00
+DOC-024,inv_24_clarity_analytics.pdf,Clarity Data Analytics,CDA-9981,2026-01-17,2700.00,270.00,2970.00
+DOC-025,inv_25_evergreen_landscaping.pdf,Evergreen Landscape Co,ELC-3382,2026-02-24,680.00,68.00,748.00
+DOC-026,inv_26_phoenix_robotics.png,Phoenix Robotics Corp,PRC-7729,2026-03-19,7500.00,750.00,8250.00
+DOC-027,inv_27_mercury_shipping.pdf,Mercury Marine Shipping,MMS-1154,2026-04-29,4100.00,410.00,4510.00
+DOC-028,inv_28_polaris_consult.pdf,Polaris Financial Advisory,PFA-6691,2026-05-09,3500.00,350.00,3850.00
+DOC-029,inv_29_cascade_beverage.jpg,Cascade Beverage Distributors,CBD-2287,2026-06-18,1120.00,112.00,1232.00
+DOC-030,inv_30_vortex_engineering.pdf,Vortex Engineering Works,VEW-8876,2026-07-22,5800.00,580.00,6380.00
+DOC-031,inv_31_radiant_clean.pdf,Radiant Facility Cleaners,RFC-4490,2026-08-15,650.00,65.00,715.00
+DOC-032,inv_32_stratus_hosting.pdf,Stratus Hosting Cloud,SHC-9905,2026-09-29,980.00,98.00,1078.00
