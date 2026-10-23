@@ -149,3 +149,4 @@ $env:PYTHONPATH='.'; .\venv\Scripts\python -m pytest -v
 ```powershell
 node --check frontend/script.js
 ```
+
