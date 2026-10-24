@@ -48,5 +48,5 @@
     "invoice_numbers": "Preserved as exact strings including leading zeros.",
     "vendors": "Normalized by stripping excess whitespace and comparing normalized substring/equality."
   },
-  "evaluated_at": "2026-10-20T14:38:17.054552"
+  "evaluated_at": "2026-10-24T06:02:03.528839"
 }

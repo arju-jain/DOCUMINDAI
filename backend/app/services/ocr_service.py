@@ -27,23 +27,44 @@ class OCRService:
         # Configure pytesseract command if available
         self._tesseract_available = False
         tess_cmd = settings.tesseract_cmd or shutil.which("tesseract")
+        if not tess_cmd:
+            # Check standard linux & windows binary locations
+            common_paths = [
+                "/usr/bin/tesseract",
+                "/usr/local/bin/tesseract",
+                r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+                r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+            ]
+            for p in common_paths:
+                if os.path.exists(p):
+                    tess_cmd = p
+                    break
+
         if tess_cmd and os.path.exists(tess_cmd):
             pytesseract.pytesseract.tesseract_cmd = tess_cmd
             self._tesseract_available = True
             logger.info("Configured external Tesseract binary at %s", tess_cmd)
         else:
-            # Check default windows location
-            default_win_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-            if os.path.exists(default_win_path):
-                pytesseract.pytesseract.tesseract_cmd = default_win_path
-                self._tesseract_available = True
-                logger.info("Detected Tesseract at default path: %s", default_win_path)
-            else:
-                logger.info("Using PyMuPDF native embedded Tesseract engine with tessdata: %s", self._tessdata_dir)
+            logger.info("Using PyMuPDF native embedded Tesseract engine with tessdata: %s", self._tessdata_dir)
 
     @property
     def is_pytesseract_available(self) -> bool:
         return self._tesseract_available
+
+    @property
+    def is_ocr_available(self) -> bool:
+        if self._tesseract_available:
+            return True
+        eng_file = Path(self._tessdata_dir) / "eng.traineddata"
+        return eng_file.exists()
+
+    @property
+    def active_engine(self) -> Optional[str]:
+        if self._tesseract_available:
+            return "pytesseract"
+        if (Path(self._tessdata_dir) / "eng.traineddata").exists():
+            return "pymupdf_tesseract"
+        return None
 
     def preprocess_image(self, img_bgr: np.ndarray) -> np.ndarray:
         """Applies image cleanup (grayscale, contrast normalization, thresholding)
@@ -112,6 +133,11 @@ class OCRService:
         """Runs OCR on an image array.
         Returns extracted text, word bounding boxes, and word-level confidences.
         """
+        if not self.is_ocr_available:
+            raise RuntimeError(
+                "OCR engine is not available. Please install Tesseract OCR or verify backend/app/tessdata/eng.traineddata exists."
+            )
+
         processed_img = self.preprocess_image(img_bgr) if apply_preprocessing else img_bgr
 
         if self._tesseract_available:
@@ -170,23 +196,24 @@ class OCRService:
         
         png_bytes = encoded.tobytes()
         img_doc = pymupdf.open("png", png_bytes)
-        pdf_bytes = img_doc.convert_to_pdf()
-        img_doc.close()
+        try:
+            pdf_bytes = img_doc.convert_to_pdf()
+        finally:
+            img_doc.close()
 
         pdf_doc = pymupdf.open("pdf", pdf_bytes)
-        page = pdf_doc[0]
-        
-        tp = page.get_textpage_ocr(
-            tessdata=self._tessdata_dir,
-            language="eng",
-            dpi=settings.ocr_dpi,
-            full=True,
-        )
-        
-        raw_words = tp.extractWORDS()
-        # raw_words items: (x0, y0, x1, y1, "word", block_no, line_no, word_no)
-        extracted_text = tp.extractText().strip()
-        pdf_doc.close()
+        try:
+            page = pdf_doc[0]
+            tp = page.get_textpage_ocr(
+                tessdata=self._tessdata_dir,
+                language="eng",
+                dpi=settings.ocr_dpi,
+                full=True,
+            )
+            raw_words = tp.extractWORDS()
+            extracted_text = tp.extractText().strip()
+        finally:
+            pdf_doc.close()
 
         words = []
         for w in raw_words:

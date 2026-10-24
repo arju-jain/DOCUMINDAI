@@ -29,9 +29,37 @@
   };
 
   function getInitialApiBaseUrl() {
+    // 1. Check window-level injected config (e.g. from environment or meta tag)
+    if (window.DOCUMIND_API_URL) {
+      return window.DOCUMIND_API_URL;
+    }
+
+    // 2. Check query parameter ?api=...
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryApi = urlParams.get('api');
+      if (queryApi) {
+        localStorage.setItem('documind_api_base_url', queryApi);
+        return queryApi;
+      }
+    } catch (_) {}
+
     let saved = localStorage.getItem('documind_api_base_url');
+
     // Auto-migrate legacy 5000 port to 8000 for FastAPI
-    if (!saved || saved.includes(':5000')) {
+    if (saved && saved.includes(':5000')) {
+      saved = null;
+    }
+
+    // If served from a web server (http/https), dynamically resolve API relative to origin if on same port or prod domain
+    if (window.location && window.location.origin && window.location.origin.startsWith('http')) {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (window.location.port === '8000' || !isLocalhost) {
+        return `${window.location.origin}/api`;
+      }
+    }
+
+    if (!saved) {
       saved = CONFIG.DEFAULT_API_BASE_URL;
       localStorage.setItem('documind_api_base_url', saved);
     }

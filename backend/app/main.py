@@ -35,13 +35,27 @@ app.add_middleware(
 app.include_router(api_router)
 
 
-@app.get("/", include_in_schema=False)
-def root():
+@app.get("/api", include_in_schema=False)
+def api_info():
     return {
         "message": "Multimodal Document Intelligence API is running.",
         "documentation": "/docs",
         "health_check": "/api/health",
     }
+
+
+# Mount frontend static files if configured and directory exists
+if settings.serve_frontend and settings.frontend_dir.is_dir():
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=str(settings.frontend_dir), html=True), name="frontend")
+else:
+    @app.get("/", include_in_schema=False)
+    def root():
+        return {
+            "message": "Multimodal Document Intelligence API is running.",
+            "documentation": "/docs",
+            "health_check": "/api/health",
+        }
 
 
 @app.exception_handler(HTTPException)

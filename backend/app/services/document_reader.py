@@ -33,7 +33,7 @@ class DocumentReader:
             max_mb = settings.max_upload_size_bytes / (1024 * 1024)
             raise DocumentValidationError(
                 f"File size exceeds the allowed limit of {max_mb:.1f} MB.",
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                status_code=getattr(status, "HTTP_413_CONTENT_TOO_LARGE", 413),
             )
 
         # Sanitize extension check
@@ -165,7 +165,7 @@ class DocumentReader:
         if img is None or img.size == 0:
             raise DocumentValidationError(
                 "Uploaded image is corrupted or cannot be decoded.",
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=getattr(status, "HTTP_422_UNPROCESSABLE_CONTENT", 422),
             )
 
         h, w = img.shape[:2]

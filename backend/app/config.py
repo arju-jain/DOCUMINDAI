@@ -5,6 +5,15 @@ from pydantic import BaseModel, Field
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# Load .env file automatically if present
+try:
+    from dotenv import load_dotenv
+    env_file = BASE_DIR / ".env"
+    if env_file.exists():
+        load_dotenv(env_file)
+except ImportError:
+    pass
+
 
 class Settings(BaseModel):
     app_name: str = "Multimodal Document Intelligence"
@@ -15,13 +24,20 @@ class Settings(BaseModel):
     host: str = Field(default_factory=lambda: os.getenv("HOST", "0.0.0.0"))
     port: int = Field(default_factory=lambda: int(os.getenv("PORT", "8000")))
     
+    # Static frontend hosting
+    serve_frontend: bool = Field(
+        default_factory=lambda: os.getenv("SERVE_FRONTEND", "True").lower() in ("true", "1", "t")
+    )
+    frontend_dir: Path = Field(default_factory=lambda: BASE_DIR / "frontend")
+
     # CORS origins
     cors_origins: List[str] = Field(
         default_factory=lambda: [
             origin.strip()
-            for origin in os.getenv(
-                "CORS_ORIGINS",
-                "http://127.0.0.1:8081,http://localhost:8081,http://127.0.0.1:8080,http://localhost:8080,http://127.0.0.1:5500,http://localhost:5500,http://localhost:5173,http://localhost:3000",
+            for origin in (
+                os.getenv("CORS_ORIGINS")
+                or os.getenv("ALLOWED_ORIGINS")
+                or "http://127.0.0.1:8081,http://localhost:8081,http://127.0.0.1:8080,http://localhost:8080,http://127.0.0.1:5500,http://localhost:5500,http://localhost:5173,http://localhost:3000"
             ).split(",")
             if origin.strip()
         ]

@@ -1,12 +1,14 @@
-import io
-import pytest
+import pymupdf
 from fastapi.testclient import TestClient
 
 
 def test_health_endpoint(client: TestClient):
     response = client.get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    data = response.json()
+    assert data["status"] == "ok"
+    assert "version" in data
+    assert "ocr_available" in data
 
 
 def test_process_document_success(client: TestClient, sample_invoice_pdf_bytes):
@@ -19,10 +21,17 @@ def test_process_document_success(client: TestClient, sample_invoice_pdf_bytes):
     assert "document_id" in data
     assert data["filename"] == "invoice.pdf"
     assert data["document_type"] == "invoice"
-    
+
     # Contract validation: all 6 fields exist
     fields = data["fields"]
-    for required_field in ["vendor_name", "invoice_number", "invoice_date", "subtotal", "tax", "grand_total"]:
+    for required_field in [
+        "vendor_name",
+        "invoice_number",
+        "invoice_date",
+        "subtotal",
+        "tax",
+        "grand_total",
+    ]:
         assert required_field in fields
         assert "value" in fields[required_field]
         assert "confidence" in fields[required_field]
@@ -82,23 +91,21 @@ def test_evaluation_endpoint(client: TestClient):
 
 
 def test_process_document_with_missing_tax(client: TestClient):
-    import pymupdf
-    doc = pymupdf.open()
-    page = doc.new_page(width=500, height=400)
-    text = """
-    Nexus Global Partners
-    100 First Street
-    
-    INVOICE
-    Invoice No: NX-1002
-    Date: 2026-10-19
-    
-    Subtotal: $500.00
-    Total: $500.00
-    """
-    page.insert_text((40, 50), text.strip(), fontsize=12)
-    pdf_bytes = doc.tobytes()
-    doc.close()
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=500, height=400)
+        text = """
+Nexus Global Partners
+100 First Street
+
+INVOICE
+Invoice No: NX-1002
+Date: 2026-10-19
+
+Subtotal: $500.00
+Total: $500.00
+"""
+        page.insert_text((40, 50), text.strip(), fontsize=12)
+        pdf_bytes = doc.tobytes()
 
     response = client.post(
         "/api/documents/process",
@@ -157,3 +164,26 @@ def test_export_empty_payload_rejected(client: TestClient):
     assert response.status_code == 400
 
 
+def test_process_oversized_file_rejected(client: TestClient):
+    # Create oversized content larger than 15MB
+    large_pdf_header = b"%PDF-1.4\n" + b"A" * (16 * 1024 * 1024)
+    response = client.post(
+        "/api/documents/process",
+        files={"file": ("large_invoice.pdf", large_pdf_header, "application/pdf")},
+    )
+    assert response.status_code == 413
+    assert "exceeds" in response.json()["detail"].lower()
+
+
+def test_api_info_endpoint(client: TestClient):
+    response = client.get("/api")
+    assert response.status_code == 200
+    data = response.json()
+    assert "documentation" in data
+    assert "health_check" in data
+
+
+def test_root_serves_frontend(client: TestClient):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "DocuMind" in response.text or "<!DOCTYPE html>" in response.text

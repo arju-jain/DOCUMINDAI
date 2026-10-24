@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  documind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: documind-ai:latest
+    container_name: documind-ai-app
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=False
+      - CORS_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,http://localhost:8081,http://127.0.0.1:8081
+      - SERVE_FRONTEND=True
+      - OCR_DPI=150
+      - MAX_UPLOAD_SIZE_BYTES=15728640
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

@@ -55,6 +55,9 @@ multidocument/
 │   └── evaluation_report.json
 ├── index.html                     # Root redirect helper to frontend/
 ├── start_dev.ps1                  # Optional full-stack starter convenience script
+├── Dockerfile                     # Multi-stage production container definition
+├── docker-compose.yml             # Local & production container orchestration
+├── .dockerignore                  # Docker build exclusions
 ├── requirements.txt               # Backend Python dependencies
 ├── .env.example                   # Safe template for environment variables
 ├── .env                           # Local environment configuration (never committed)
@@ -134,10 +137,11 @@ Unrestricted wildcards (`*`) are disabled to ensure safe origin isolation.
 
 ## 5. Testing & Verification
 
-### Run Automated Unit & Integration Tests (49 Tests)
+### Run Automated Unit & Integration Tests (55 Tests)
 ```powershell
-$env:PYTHONPATH='.'; .\venv\Scripts\python -m pytest -v
+.\venv\Scripts\python -m pytest -v
 ```
+*Current test suite: **55 passed, 0 failed, 0 warnings**.*
 
 ### Run Benchmark Accuracy Evaluation (32 Held-Out Documents)
 ```powershell
@@ -149,4 +153,66 @@ $env:PYTHONPATH='.'; .\venv\Scripts\python -m pytest -v
 ```powershell
 node --check frontend/script.js
 ```
+
+---
+
+## 6. Docker & Production Deployment Guide
+
+DocuMind AI provides a production-hardened containerization setup with multi-worker ASGI execution and automated health monitoring. In container environments, the backend also serves the static frontend dashboard at `/` so that the entire solution can be deployed as a single turnkey service.
+
+### Quick Start with Docker Compose
+
+```bash
+# Build and launch the container in the background
+docker-compose up -d --build
+
+# Verify container health
+docker-compose ps
+```
+
+- **Unified Dashboard & API**: `http://localhost:8000/`
+- **REST API Endpoint**: `http://localhost:8000/api`
+- **Interactive Swagger Documentation**: `http://localhost:8000/docs`
+- **Container Health Check**: `http://localhost:8000/api/health`
+
+### Building and Running with Standalone Docker
+
+```bash
+# Build production Docker image
+docker build -t documind-ai:latest .
+
+# Run the container
+docker run -d \
+  --name documind-app \
+  -p 8000:8000 \
+  -e CORS_ORIGINS="http://localhost:8000,http://127.0.0.1:8000" \
+  -e SERVE_FRONTEND=True \
+  --restart unless-stopped \
+  documind-ai:latest
+```
+
+### Production Environment Variables Reference
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `HOST` | `0.0.0.0` | Network binding interface for the ASGI server |
+| `PORT` | `8000` | Port on which the ASGI server listens |
+| `DEBUG` | `False` | Disables debug mode and autoreload in production |
+| `SERVE_FRONTEND` | `True` | Serves the frontend web dashboard from `/` |
+| `CORS_ORIGINS` | *(Local dev origins)* | Comma-separated whitelist of allowed browser origins |
+| `MAX_UPLOAD_SIZE_BYTES` | `15728640` (15 MB) | Maximum permitted file upload size in bytes |
+| `MAX_PAGES` | `15` | Maximum PDF pages processed per document |
+| `TESSERACT_CMD` | `""` (auto-detect) | Absolute path to external Tesseract executable if custom |
+| `TESSDATA_DIR` | `backend/app/tessdata` | Path to directory containing `eng.traineddata` |
+| `OCR_DPI` | `150` | DPI resolution used for PDF page rasterization |
+| `CONFIDENCE_THRESHOLD` | `0.60` | Score threshold below which fields are marked `low_confidence` |
+| `ROUNDING_TOLERANCE` | `0.05` | Currency arithmetic tolerance for validation |
+
+### System OCR Engine Setup
+
+The application features a dual-layer OCR architecture:
+1. **PyMuPDF Embedded Tesseract (Built-in)**: Uses `backend/app/tessdata/eng.traineddata` to run native C++ OCR without requiring external binaries.
+2. **System Tesseract (Container / Server)**: The provided `Dockerfile` installs `tesseract-ocr` and `tesseract-ocr-eng` via Debian APT for maximum throughput and compatibility.
+   - On Debian / Ubuntu: `sudo apt-get install -y tesseract-ocr tesseract-ocr-eng libgl1`
+   - On Windows: Download and install from [UB-Mannheim Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) to `C:\Program Files\Tesseract-OCR\tesseract.exe`.
 

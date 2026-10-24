@@ -51,6 +51,9 @@ class DocumentProcessResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str = "ok"
+    version: str = "1.0.0"
+    ocr_available: bool = True
+    ocr_engine: Optional[str] = None
 
 
 class FieldAccuracyReport(BaseModel):
